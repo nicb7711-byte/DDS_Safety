@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>DDS Safety Contact Randomizer</title>
+
+<style>
+ body {
+  font-family: Arial;
+  background: #111827;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.card {
+  background: #1f2937;
+  padding: 30px;
+  border-radius: 16px;
+  text-align: center;
+  width: 620px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+h2 {
+  margin-bottom: 10px;
+}
+
+.weather {
+  font-size: 14px;
+  color: #9ca3af;
+  margin-bottom: 10px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.normal { background: #6b7280; }
+
+.contact {
+  background: #374151;
+  padding: 20px;
+  border-radius: 12px;
+  margin: 20px 0;
+  font-size: 18px;
+}
+
+#conditionList {
+  background: #374151;
+  border: 1px solid #4b5563;
+  padding: 15px;
+  border-radius: 12px;
+  margin-top: 15px;
+  font-size: 16px;
+  text-align: left;
+}
+
+/* ✅ your hourly box if added */
+#hourlyForecast {
+  background: #374151;
+  border: 1px solid #4b5563;
+  padding: 15px;
+  border-radius: 12px;
+  margin-top: 15px;
+  font-size: 14px;
+  text-align: left;
+}
+
+
+button {
+  padding: 10px 18px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  margin: 5px;
+  background: #2563eb;
+  color: white;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+/* ✅ LIGHT MODE (ONLY COLORS CHANGE — layout untouched) */
+@media (prefers-color-scheme: light) {
+  #plantSelect {
+    background: #e5e7eb;
+    color: #111827;
+    border: 1px solid #d1d5db;
+  }
+
+  body {
+    background: #f3f4f6;
+    color: #111827;
+  }
+
+  .card {
+    background: #ffffff;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+
+  .weather {
+    color: #4b5563;
+  }
+
+  .contact {
+    background: #e5e7eb;
+  }
+
+  #conditionList {
+    background: #e5e7eb;
+    border: 1px solid #d1d5db;
+  }
+
+  #hourlyForecast {
+    background: #e5e7eb;
+    border: 1px solid #d1d5db;
+  }
+
+  button {
+    background: #2563eb;
+    color: white;
+  }
+
+  button:hover {
+    background: #1d4ed8;
+  }
+}
+/* ✅ Styled location dropdown */
+#plantSelect {
+  background: #374151;
+  color: white;
+  border: 1px solid #4b5563;
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  appearance: none;
+}
+
+/* ✅ Custom arrow */
+#plantSelect {
+  background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M5.516 7.548a.625.625 0 0 1 .884 0L10 11.148l3.6-3.6a.625.625 0 1 1 .884.884l-4.042 4.042a.625.625 0 0 1-.884 0L5.516 8.432a.625.625 0 0 1 0-.884z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 14px;
+  padding-right: 30px;
+}
+
+/* ✅ Hover effect */
+#plantSelect:hover {
+  border-color: #2563eb;
+}
+
+/* ✅ Center it */
+#plantSelect {
+  display: block;
+  margin: 0 auto 10px auto;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>DDS Safety Contact Randomizer</h2>
+
+<div style="margin-bottom: 10px;">
+  <select id="plantSelect" onchange="updateLocation()">
+    <option value="43.875532,-85.508764">Reed City, MI</option>
+    <option value="35.846111,-86.391945">Murfreesboro,TN</option>
+	<option value="42.331427,-83.045754">Detroit, MI</option>
+	<option value="41.878113,-87.629799">Chicago, IL</option>
+	<option value="42.827396,-78.822805">Buffalo, NY</option>
+	<option value="42.733932,-90.334675">Belmont, WI</option>
+	<option value="45.183640,-89.676940">Merrill, WI</option>
+	<option value="43.568781,-116.566716">Nampa, ID</option>
+	<option value="42.871487,-71.381180">Londonderry, NH</option>
+	<option value="42.887622,-72.559058">Brattleboro, VT</option>
+	<option value="32.865529,-111.779472">Casa Grande, AZ</option>
+	<option value="37.463472,-120.868420">Turlock, CA</option>	
+	<option value="36.207728,-119.204198">Tulare, CA</option>
+	<option value="44.959135,-89.630122">Wausau, WI</option>
+  </select>
+</div>
+
+  <div id="weatherDetails" class="weather">As of 7:45 AM EST/EDT — Temp: 55.8°F | Wind: 8.3 mph | Humidity: 50% | Rain: 0"</div>
+  <div id="badge" class="badge normal"></div>
+
+  <div id="contact" class="contact">Watch out for others working around you.</div>
+
+  <button onclick="getRandom()">New Safety Contact</button>
+  <button onclick="loadData()">Refresh Conditions</button>
+
+  <div id="conditionList" style="display: block;"><strong>Today's Condition Reminders (Next 8 Hours):</strong><br><br>• High humidity—watch for slippery surfaces and fatigue.</div>
+<div id="hourlyForecast" class="contact" style="margin-top:15px; font-size:14px; text-align:left;">
+  Loading hourly forecast...
+</div>
+
+<script>
+
+const fallbackContacts = [
+"Wear the proper PPE required for your task today and ensure it is in good condition before starting work.",
+"Use the correct type of gloves for the specific hazards of the task, including cut, chemical, or heat resistance as needed.",
+"Wear eye protection whenever there is any risk of flying debris, splashes, or airborne particles.",
+"Ensure hearing protection is worn and properly fitted in all designated high-noise areas to prevent long-term hearing loss.",
+"Always verify lockout/tagout (LOTO) is properly applied before servicing or maintaining equipment.",
+"Double-check all energy isolation points to confirm all sources of energy have been effectively controlled before work begins.",
+"Never assume equipment is de-energized—always test and verify before touching.",
+"Use the proper lockout devices that are designed for the specific equipment and energy source.",
+"Follow all LOTO procedures exactly as written and do not take shortcuts under any circumstances.",
+"Keep your work area clean, organized, and free of unnecessary clutter to reduce hazards.",
+"Identify and remove any trip hazards from walkways and working surfaces immediately.",
+"Clean up spills right away using proper materials to prevent slips and falls.",
+"Maintain clear and unobstructed access to all exits, emergency equipment, and pathways.",
+"Keep tools organized during use and return them to proper storage after completing the task.",
+"Use proper lifting techniques by keeping your back straight and lifting with your legs.",
+"Avoid twisting your body while lifting or carrying heavy items to prevent injury.",
+"Ask for help or team lifting when moving heavy, bulky, or awkward loads.",
+"Use mechanical lifting aids such as carts, hoists, or forklifts whenever possible.",
+"Position your body correctly and maintain stable footing to avoid strains and sprains.",
+"Avoid overreaching and always maintain proper balance and control during tasks.",
+"Inspect all tools prior to use to ensure they are safe and functioning correctly.",
+"Do not use damaged or defective equipment—tag it out and report it immediately.",
+"Always select and use the right tool for the job to ensure safety and efficiency.",
+"Maintain tools in good working condition through proper care and maintenance.",
+"Return tools to their designated storage locations to keep work areas organized and safe.",
+"Be aware of pinch points and keep hands and fingers clear when working around machinery.",
+"Keep hands, clothing, and body parts away from moving equipment and components.",
+"Never bypass or disable machine guards or safety devices designed for protection.",
+"Ensure all guards are properly installed and secured before operating equipment.",
+"Stay alert and maintain a safe distance when working near rotating or moving equipment.",
+"Make clear eye contact with forklift or equipment operators to confirm awareness before approaching.",
+"Stay alert and maintain safe distance from moving vehicles and mobile equipment at all times.",
+"Use designated walkways and crossings, especially in high-traffic areas.",
+"Never walk or stand under suspended loads or lifted materials.",
+"Communicate clearly and effectively with team members during all operations.",
+"Use standardized hand signals, radios, or communication devices when required.",
+"Confirm task understanding and roles with your team before beginning any job.",
+"Stay aware of others working around you and coordinate activities safely.",
+"Only perform tasks you are trained and qualified to do.",
+"Ask questions and seek clarification whenever unsure about a task or hazard.",
+"Follow all established standard operating procedures for each job.",
+"Avoid rushing—perform all tasks in a controlled and deliberate manner.",
+"Maintain focus on your work and avoid distractions that could lead to mistakes.",
+"Take time to properly plan your work and identify potential hazards before starting.",
+"Report unsafe conditions or hazards immediately so they can be corrected.",
+"Report all near misses to help prevent future incidents and improve safety.",
+"Speak up and intervene if something does not look safe or correct.",
+"Follow all site-specific safety rules, policies, and expectations consistently.",
+"Inspect ladders before each use to ensure they are safe and undamaged.",
+"Maintain three points of contact when climbing or descending ladders.",
+"Never stand on the top rung or step of a ladder.",
+"Ensure ladders are stable, secured, and positioned correctly before use.",
+"Use appropriate fall protection equipment when working at heights.",
+"Inspect all fall protection gear prior to use for wear or damage.",
+"Ensure anchor points for fall protection are rated, approved, and secure.",
+"Maintain proper footing and balance when working at elevation.",
+"Ensure your work area has adequate lighting to safely perform tasks.",
+"Report and replace burned-out or malfunctioning lights promptly.",
+"Avoid performing work in poorly lit areas whenever possible.",
+"Use portable lighting solutions when additional visibility is needed.",
+"Check chemical labels carefully before use to understand hazards.",
+"Follow all proper handling, storage, and disposal procedures for chemicals.",
+"Use the required PPE when handling or working with any chemicals.",
+"Know where Safety Data Sheets (SDS) are located and how to access them.",
+"Ensure proper ventilation is available when working with hazardous substances.",
+"Keep electrical panels and disconnects accessible with no obstructions.",
+"Do not block access to breakers, switches, or emergency disconnects.",
+"Use proper electrical PPE when working on or near energized systems.",
+"Avoid contact and report any exposed wiring or energized components.",
+"Inspect all cords and cables for damage before use.",
+"Identify and properly control all sources of stored energy before work begins.",
+"Use caution when working around hydraulic and pneumatic systems under pressure.",
+"Release or isolate stored pressure before servicing equipment.",
+"Ensure components are properly secured to prevent unexpected movement.",
+"Keep body parts out of potential line-of-fire situations where energy could release.",
+"Ensure proper guarding is in place on conveyors and mechanical equipment.",
+"Wear the proper PPE required for your task today, ensuring it meets site standards and is appropriate for the specific hazards involved.",
+"Inspect all PPE before use, checking for cracks, wear, contamination, or defects that could reduce protection.",
+"Ensure PPE fits properly and is adjusted correctly so it provides full protection without restricting movement.",
+"Use task-specific gloves and verify they are rated for the hazards, such as cut resistance, chemical compatibility, or thermal protection.",
+"Remove and replace gloves immediately if they become damaged, saturated, or contaminated during use.",
+"Wear eye protection that is appropriate for the hazard, including safety glasses, goggles, or face shields as required.",
+"Ensure eye protection is clean and free of scratches or fogging that could impair vision.",
+"Use hearing protection in designated areas and ensure it is worn correctly to achieve full noise reduction.",
+"Select the correct type of hearing protection—earplugs or earmuffs—based on noise levels and job requirements.",
+"Wear head protection in all required areas and check for cracks, damage, or expired equipment before use.",
+"Ensure hard hats are worn correctly, facing forward and properly adjusted for a secure fit.",
+"Use respiratory protection when required and ensure it is approved, properly fitted, and compatible with the hazard.",
+"Do not use respirators unless trained and medically cleared if required by your facility guidelines.",
+"Perform a fit check each time you wear a respirator to ensure a proper seal.",
+"Wear proper footwear with required safety features such as steel toe, slip resistance, and electrical hazard protection.",
+"Ensure footwear is in good condition and provides proper support to reduce fatigue and injury risk.",
+"Use high-visibility clothing when working around moving equipment or in low-visibility conditions.",
+"Keep PPE clean and well-maintained to ensure it performs as intended.",
+"Store PPE properly after use to prevent damage, contamination, or degradation.",
+"Do not modify or alter PPE, as this can reduce its effectiveness and violate safety requirements.",
+"Follow all site-specific PPE requirements, including task-based PPE assessments.",
+"Replace PPE immediately if it becomes damaged, worn, or no longer provides adequate protection.",
+"Ensure all required PPE is worn for the entire duration of the task, not just during setup.",
+"Be aware of additional PPE requirements when conditions change, such as new hazards or environmental factors.",
+"Take responsibility for your PPE and do not share equipment unless it is designed to be shared and properly sanitized.",
+"Understand the limitations of your PPE and do not rely on it as the only control—follow all safety procedures.",
+"Report any PPE deficiencies or shortages immediately so they can be corrected before work continues.",
+"Make PPE use a habit—protect yourself on every task, every time, without exception.",
+"Stay clear of belt drives, rollers, and other pinch point hazards.",
+"Ensure emergency stop devices are visible, accessible, and functional.",
+"Test emergency stops when required to confirm proper operation.",
+"Know the location of fire extinguishers and emergency response equipment.",
+"Ensure fire extinguisher access remains clear and unobstructed.",
+"Understand basic fire response procedures and emergency actions.",
+"Follow hot work permit procedures when performing welding or cutting operations.",
+"Continuously monitor for sparks, heat, or ignition sources during hot work.",
+"Inspect all PPE before each use for damage or wear.",
+"Replace any damaged or worn PPE immediately before continuing work.",
+"Ensure PPE fits properly to provide maximum protection.",
+"Store PPE correctly to maintain its condition and effectiveness.",
+"Take short breaks as needed to reduce fatigue and maintain alertness.",
+"Stay mentally focused and aware throughout all tasks.",
+"Recognize signs of fatigue and take appropriate action before continuing work.",
+"Maintain situational awareness and monitor your surroundings at all times.",
+"Be mindful of changing conditions in the workplace that could introduce new hazards.",
+"Plan every task with safety as the top priority.",
+"Follow proper communication protocols during lockout/tagout activities.",
+"Coordinate closely with team members during maintenance and operations.",
+"Ensure proper hand placement to avoid injuries during tasks.",
+"Never put yourself in a position that feels unsafe or uncontrolled.",
+"Pause and think before you act—make safety your first decision.",
+"Commit to completing every task the safe way, every time."
+];
+
+let currentList = [...fallbackContacts];
+let latitude = 43.875532;
+let longitude = -85.508764;
+
+function updateLocation() {
+  const selected = document.getElementById("plantSelect").value;
+  const parts = selected.split(",");
+  latitude = parseFloat(parts[0]);
+  longitude = parseFloat(parts[1]);
+  loadData(); // refresh weather with new location
+}
+
+async function loadData() {
+  try {
+    const res = await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,precipitation,windspeed_10m`
+);
+
+    const data = await res.json();
+
+    const tempC = data.current_weather.temperature;
+    const tempF = (tempC * 9/5) + 32;
+    const wind = data.current_weather.windspeed * 0.621371;
+
+    // ✅ Match correct hourly index
+    const nowTime = data.current_weather.time;
+    // ✅ Convert current time to Date
+    const nowUTC = new Date(nowTime + "Z");
+
+    // ✅ Find closest hourly index
+    let safeIndex = 0;
+
+    for (let i = 0; i < data.hourly.time.length; i++) {
+    const hourTime = new Date(data.hourly.time[i] + "Z");
+
+     if (hourTime <= nowUTC) {
+    safeIndex = i;
+  } else {
+    break;
+  }
+}
+
+   
+ const humidity =
+   (data.hourly.relativehumidity_2m[safeIndex] +
+   (data.hourly.relativehumidity_2m[safeIndex + 1] || 0)) / 2;
+
+    // ✅ average nearby hour values to smooth it
+   const rain_now =
+     (data.hourly.precipitation[safeIndex] * 0.03937 +
+      (data.hourly.precipitation[safeIndex + 1] || 0)) / 2;
+
+   const rain = rain_now;
+
+
+    // ✅ Format "As of"
+
+	const now = new Date(nowTime + "Z");
+
+	const formattedTime = now.toLocaleTimeString("en-US", {
+ 	 timeZone: "America/New_York",
+  	 hour: "numeric",
+  	 minute: "2-digit"
+});
+
+    // ✅ Display full weather
+    document.getElementById("weatherDetails").innerText =
+     `As of ${formattedTime} EST/EDT — Temp: ${tempF.toFixed(1)}°F | Wind: ${wind.toFixed(2)} mph | Humidity: ${humidity}% | Rain: ${rain.toFixed(2)}"` 
+
+    let conditions = [];
+    let messages = [];
+
+    // ✅ Look ahead 8 hours
+    for (let i = safeIndex; i < safeIndex + 9; i++) {
+
+      const tF = (data.hourly.temperature_2m[i] * 9/5) + 32;
+
+      if (tF > 85 && !conditions.includes("🔥 Heat Risk")) {
+        conditions.push("🔥 Heat Risk");
+        messages.push("• High heat conditions—hydrate and take breaks.");
+      }
+
+      if (tF < 32 && !conditions.includes("🧊 Cold Risk")) {
+        conditions.push("🧊 Cold Risk");
+        messages.push("• Freezing conditions—watch for ice hazards.");
+      }
+
+      if (wind > 20 && !conditions.includes("💨 High Wind")) {
+        conditions.push("💨 High Wind");
+        messages.push("• High winds—secure materials and use caution outdoors.");
+      }
+
+      if (data.hourly.relativehumidity_2m[i] > 80 && !conditions.includes("💧 High Humidity")) {
+        conditions.push("💧 High Humidity");
+        messages.push("• High humidity—watch for slippery surfaces and fatigue.");
+      }
+
+      if (data.hourly.precipitation[i] > 0.1259 && !conditions.includes("🌧️ Wet Conditions")) {
+        conditions.push("🌧️ Wet Conditions");
+        messages.push("• Wet conditions—be aware of slip and trip hazards.");
+      }
+    }
+
+    if (conditions.length === 0) {
+      conditions.push("✅ Normal Conditions");
+    }
+
+    document.getElementById("badge").innerText = conditions.join(" | ");
+
+    const conditionDiv = document.getElementById("conditionList");
+
+    if (messages.length > 0) {
+      conditionDiv.style.display = "block";
+      conditionDiv.innerHTML =
+        "<strong>Today's Condition Reminders (Next 8 Hours):</strong><br><br>" +
+        messages.join("<br>");
+    } else {
+      conditionDiv.style.display = "none";
+    }
+// ✅ HOURLY FORECAST (NEXT 8 HOURS)
+
+let hourlyDisplay = "<strong>Next 8 Hours:</strong> (Forecast from API.Open-Meteo.com and is not real-time)<br><br>";
+
+for (let i = 0; i <= 8; i++) {
+
+  const idx = safeIndex + i;
+
+  // ✅ HARD stop if out of range (IMPORTANT)
+  if (
+    !data.hourly.time[idx] ||
+    data.hourly.temperature_2m[idx] === undefined
+  ) break;
+
+  // ✅ Use API time directly (correct fix)
+  const hourUTC = data.hourly.time[idx];
+  const hourDate = new Date(hourUTC + "Z");
+
+  const hourFormatted = hourDate.toLocaleTimeString("en-US", {
+    timeZone: "America/New_York",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true
+  });
+
+  // ✅ SAFE DATA ACCESS
+  const tempF_hour = (data.hourly.temperature_2m[idx] * 9/5) + 32;
+  const wind_hour = (data.hourly.windspeed_10m[idx] * 0.621371);
+  let humidity_hour =
+  (data.hourly.relativehumidity_2m[idx] +
+   (data.hourly.relativehumidity_2m[idx + 1] || 0)) / 2;
+
+ 
+  const rain_hour = data.hourly.precipitation[idx] * 0.03937;
+ // ✅ Boost if rain present
+  if (rain_hour > 0.2) {
+    humidity_hour = Math.max(humidity_hour, 75);
+  }
+  // ✅ ICONS
+  let icons = "";
+
+  if (tempF_hour > 85) icons += "🔥 ";
+  if (tempF_hour < 32) icons += "🧊 ";
+  if (wind_hour > 20) icons += "💨 ";
+  if (humidity_hour > 80) icons += "💧 ";
+  if (rain_hour > 0.005) icons += "🌧️ ";
+
+  icons = icons.trim();
+
+  // ✅ HIGHLIGHT
+  let highlight =
+    tempF_hour > 85 ||
+    tempF_hour < 32 ||
+    wind_hour > 20 ||
+    humidity_hour > 80 ||
+    rain_hour > 0.005;
+
+  // ✅ CLEAN FORMATTING
+  const format = (num) => parseFloat(num.toFixed(2));
+
+  let line =
+    (i === 0
+      ? `<strong>${hourFormatted} ▬▬</strong>`
+      : `${hourFormatted} ▬▬`) +
+    (icons ? ` ${icons}` : "") +
+    ` Temp: ${format(tempF_hour)}°F | Wind: ${format(wind_hour)} mph | Humidity: ${humidity_hour}% | Rain: ${format(rain_hour)}"`;
+
+  if (highlight) {
+    line = `<span style="color:#fbbf24; font-weight:bold;">${line}</span>`;
+  }
+
+  hourlyDisplay += line + "<br>";
+}
+
+// ✅ ALWAYS render (even if partial)
+document.getElementById("hourlyForecast").innerHTML = hourlyDisplay;
+
+
+    getRandom();
+
+  } catch {
+    document.getElementById("weatherDetails").innerText = "Offline mode";
+    document.getElementById("badge").innerText = "Offline Mode";
+    document.getElementById("conditionList").style.display = "none";
+    document.getElementById("hourlyForecast").innerHTML = "Hourly forecast unavailable";
+    getRandom();
+  }
+}
+
+function getRandom() {
+  const i = Math.floor(Math.random() * fallbackContacts.length);
+  document.getElementById("contact").innerText = fallbackContacts[i];
+}
+
+loadData();
+
+</script>
+
+
+</body></html>
