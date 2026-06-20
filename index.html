@@ -393,25 +393,34 @@ const fallbackContacts = [
 ];
 
 let currentList = [...fallbackContacts];
+
 let latitude = 43.875532;
 let longitude = -85.508764;
+
+let currentTimeZone = "America/New_York";
 
 function updateLocation() {
   const selected = document.getElementById("plantSelect").value;
   const parts = selected.split(",");
+
   latitude = parseFloat(parts[0]);
   longitude = parseFloat(parts[1]);
-  loadData(); // refresh weather with new location
-}
+
+  currentTimeZone = getTimeZone(latitude);
+
+  loadData();
+} // refresh weather with new location
+
 
 async function loadData() {
   try {
     const res = await fetch(
       `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,precipitation,windspeed_10m`
+
 );
 
     const data = await res.json();
-
+	
     const tempC = data.current_weather.temperature;
     const tempF = (tempC * 9/5) + 32;
     const wind = data.current_weather.windspeed * 0.621371;
@@ -441,8 +450,8 @@ async function loadData() {
 
     // ✅ average nearby hour values to smooth it
    const rain_now =
-     (data.hourly.precipitation[safeIndex] * 0.03937 +
-      (data.hourly.precipitation[safeIndex + 1] || 0)) / 2;
+	((data.hourly.precipitation[safeIndex] * 0.03937) +
+	((data.hourly.precipitation[safeIndex + 1] || 0) * 0.03937)) / 2;
 
    const rain = rain_now;
 
@@ -452,14 +461,14 @@ async function loadData() {
 	const now = new Date(nowTime + "Z");
 
 	const formattedTime = now.toLocaleTimeString("en-US", {
- 	 timeZone: "America/New_York",
+ 	 timeZone: currentTimeZone,
   	 hour: "numeric",
   	 minute: "2-digit"
 });
 
     // ✅ Display full weather
     document.getElementById("weatherDetails").innerText =
-     `As of ${formattedTime} EST/EDT — Temp: ${tempF.toFixed(1)}°F | Wind: ${wind.toFixed(2)} mph | Humidity: ${humidity}% | Rain: ${rain.toFixed(2)}"` 
+     `As of ${formattedTime} — Temp: ${tempF.toFixed(1)}°F | Wind: ${wind.toFixed(2)} mph | Humidity: ${humidity}% | Rain: ${rain.toFixed(2)}"` 
 
     let conditions = [];
     let messages = [];
@@ -489,7 +498,7 @@ async function loadData() {
         messages.push("• High humidity—watch for slippery surfaces and fatigue.");
       }
 
-      if (data.hourly.precipitation[i] > 0.1259 && !conditions.includes("🌧️ Wet Conditions")) {
+      if (data.hourly.precipitation[i] > 0.005 && !conditions.includes("🌧️ Wet Conditions")) {
         conditions.push("🌧️ Wet Conditions");
         messages.push("• Wet conditions—be aware of slip and trip hazards.");
       }
@@ -530,7 +539,7 @@ for (let i = 0; i <= 8; i++) {
   const hourDate = new Date(hourUTC + "Z");
 
   const hourFormatted = hourDate.toLocaleTimeString("en-US", {
-    timeZone: "America/New_York",
+    timeZone: currentTimeZone,
     hour: "numeric",
     minute: "2-digit",
     hour12: true
@@ -544,7 +553,8 @@ for (let i = 0; i <= 8; i++) {
    (data.hourly.relativehumidity_2m[idx + 1] || 0)) / 2;
 
  
-  const rain_hour = data.hourly.precipitation[idx] * 0.03937;
+  const rain_hour = (data.hourly.precipitation[idx] || 0) * 0.03937;
+
  // ✅ Boost if rain present
   if (rain_hour > 0.2) {
     humidity_hour = Math.max(humidity_hour, 75);
@@ -591,7 +601,8 @@ document.getElementById("hourlyForecast").innerHTML = hourlyDisplay;
 
     getRandom();
 
-  } catch {
+  } catch (err) {
+  console.error(err);
     document.getElementById("weatherDetails").innerText = "Offline mode";
     document.getElementById("badge").innerText = "Offline Mode";
     document.getElementById("conditionList").style.display = "none";
@@ -603,6 +614,17 @@ document.getElementById("hourlyForecast").innerHTML = hourlyDisplay;
 function getRandom() {
   const i = Math.floor(Math.random() * fallbackContacts.length);
   document.getElementById("contact").innerText = fallbackContacts[i];
+}
+
+function getTimeZone(lat) {
+  if (lat >= 40 && lat <= 50) {
+    // Eastern or Central boundary
+    return lat < 42 ? "America/Chicago" : "America/New_York";
+  }
+  if (lat < 35) return "America/Phoenix"; // AZ
+  if (lat < 38) return "America/Los_Angeles"; // CA region
+  if (lat < 45) return "America/Chicago"; // Midwest
+  return "America/New_York"; // fallback
 }
 
 loadData();
