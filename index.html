@@ -493,7 +493,7 @@ async function loadData() {
         messages.push("• High winds—secure materials and use caution outdoors.");
       }
 
-      if (data.hourly.relativehumidity_2m[i] > 80 && !conditions.includes("💧 High Humidity")) {
+      if (data.hourly.relativehumidity_2m[i] > 79 && !conditions.includes("💧 High Humidity")) {
         conditions.push("💧 High Humidity");
         messages.push("• High humidity—watch for slippery surfaces and fatigue.");
       }
@@ -565,7 +565,7 @@ for (let i = 0; i <= 8; i++) {
   if (tempF_hour > 85) icons += "🔥 ";
   if (tempF_hour < 32) icons += "🧊 ";
   if (wind_hour > 20) icons += "💨 ";
-  if (humidity_hour > 80) icons += "💧 ";
+  if (humidity_hour > 79) icons += "💧 ";
   if (rain_hour > 0.005) icons += "🌧️ ";
 
   icons = icons.trim();
@@ -575,7 +575,7 @@ for (let i = 0; i <= 8; i++) {
     tempF_hour > 85 ||
     tempF_hour < 32 ||
     wind_hour > 20 ||
-    humidity_hour > 80 ||
+    humidity_hour > 79 ||
     rain_hour > 0.005;
 
   // ✅ CLEAN FORMATTING
