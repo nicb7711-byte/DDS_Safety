@@ -444,9 +444,7 @@ async function loadData() {
 }
 
    
- const humidity =
-   (data.hourly.relativehumidity_2m[safeIndex] +
-   (data.hourly.relativehumidity_2m[safeIndex + 1] || 0)) / 2;
+ const humidity = data.hourly.relativehumidity_2m[safeIndex];
 
     // ✅ average nearby hour values to smooth it
    const rain_now =
@@ -474,31 +472,37 @@ async function loadData() {
     let messages = [];
 
     // ✅ Look ahead 8 hours
-    for (let i = safeIndex; i < safeIndex + 9; i++) {
+    for (let i = safeIndex; i < safeIndex + 9; i++) 
+	{
 
       const tF = (data.hourly.temperature_2m[i] * 9/5) + 32;
 
-      if (tF > 85 && !conditions.includes("🔥 Heat Risk")) {
+      if (tF >= 85 && !conditions.includes("🔥 Heat Risk")) 
+	  {
         conditions.push("🔥 Heat Risk");
         messages.push("• High heat conditions—hydrate and take breaks.");
       }
 
-      if (tF < 32 && !conditions.includes("🧊 Cold Risk")) {
+      if (tF <= 32 && !conditions.includes("🧊 Cold Risk")) 
+	  {
         conditions.push("🧊 Cold Risk");
         messages.push("• Freezing conditions—watch for ice hazards.");
       }
 
-      if (wind > 20 && !conditions.includes("💨 High Wind")) {
+      if (wind >= 20 && !conditions.includes("💨 High Wind")) 
+	  {
         conditions.push("💨 High Wind");
         messages.push("• High winds—secure materials and use caution outdoors.");
       }
 
-      if (data.hourly.relativehumidity_2m[i] > 79 && !conditions.includes("💧 High Humidity")) {
+      if (data.hourly.relativehumidity_2m[i] >= 80 && !conditions.includes("💧 High Humidity")) 
+	  {
         conditions.push("💧 High Humidity");
         messages.push("• High humidity—watch for slippery surfaces and fatigue.");
       }
 
-      if (data.hourly.precipitation[i] > 0.005 && !conditions.includes("🌧️ Wet Conditions")) {
+      if (data.hourly.precipitation[i] >= 0.005 && !conditions.includes("🌧️ Wet Conditions")) 
+	  {
         conditions.push("🌧️ Wet Conditions");
         messages.push("• Wet conditions—be aware of slip and trip hazards.");
       }
@@ -548,35 +552,27 @@ for (let i = 0; i <= 8; i++) {
   // ✅ SAFE DATA ACCESS
   const tempF_hour = (data.hourly.temperature_2m[idx] * 9/5) + 32;
   const wind_hour = (data.hourly.windspeed_10m[idx] * 0.621371);
-  let humidity_hour =
-  (data.hourly.relativehumidity_2m[idx] +
-   (data.hourly.relativehumidity_2m[idx + 1] || 0)) / 2;
-
- 
+  let humidity_hour = data.hourly.relativehumidity_2m[idx];
   const rain_hour = (data.hourly.precipitation[idx] || 0) * 0.03937;
 
- // ✅ Boost if rain present
-  if (rain_hour > 0.2) {
-    humidity_hour = Math.max(humidity_hour, 75);
-  }
   // ✅ ICONS
   let icons = "";
 
-  if (tempF_hour > 85) icons += "🔥 ";
-  if (tempF_hour < 32) icons += "🧊 ";
-  if (wind_hour > 20) icons += "💨 ";
-  if (humidity_hour > 79) icons += "💧 ";
-  if (rain_hour > 0.005) icons += "🌧️ ";
+  if (tempF_hour >= 85) icons += "🔥 ";
+  if (tempF_hour <= 32) icons += "🧊 ";
+  if (wind_hour >= 20) icons += "💨 ";
+  if (humidity_hour >= 80) icons += "💧 ";
+  if (rain_hour >= 0.005) icons += "🌧️ ";
 
   icons = icons.trim();
 
   // ✅ HIGHLIGHT
   let highlight =
-    tempF_hour > 85 ||
-    tempF_hour < 32 ||
-    wind_hour > 20 ||
-    humidity_hour > 79 ||
-    rain_hour > 0.005;
+    tempF_hour >= 85 ||
+    tempF_hour <= 32 ||
+    wind_hour >= 20 ||
+    humidity_hour >= 80 ||
+    rain_hour >= 0.005;
 
   // ✅ CLEAN FORMATTING
   const format = (num) => parseFloat(num.toFixed(2));
